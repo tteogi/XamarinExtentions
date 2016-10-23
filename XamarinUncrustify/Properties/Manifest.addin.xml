@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ExtensionModel>
+	<Extension path="/MonoDevelop/Ide/Commands/Help">
+		<Command id="XamarinUncrustify.GistCommands.GistIdeInformation" _label="Create About Gist" _description="Will create and open a gist of the Ide About information. Useful for reporting bugs." defaultHandler="XamarinUncrustify.FormattingCommander" />
+	</Extension>
+	<Extension path="/MonoDevelop/Ide/MainMenu/Help">
+		<CommandItem id="XamarinUncrustify.GistCommands.GistIdeInformation" />
+	</Extension>
+	<Extension path="/MonoDevelop/Ide/StartupHandlers">
+		<Class class="XamarinUncrustify.StateHandler" />
+	</Extension>
+
+	<Extension path = "/MonoDevelop/ProjectModel/Gui/ItemOptionPanels">
+		<Section id="XamarinUncrustify" _label="Xamarin Uncrustify" >
+			<ComplexCondition>
+				<Or>
+					<Condition id="ItemType" value="SolutionFolderItem" />
+					<Condition id="ItemType" value="Solution" />
+				</Or>
+				<Section id="XamarinUncrustifyConfig" _label="Uncrustify Configure" fill="true" class="XamarinUncrustify.ConfigurePanel" />
+			</ComplexCondition>
+		</Section>
+	</Extension>
+	
+	<Runtime>
+		<Import assembly="XamarinUncrustify.dll" />
+	</Runtime>
+</ExtensionModel>
