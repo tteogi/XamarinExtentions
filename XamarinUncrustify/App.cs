@@ -9,5 +9,7 @@ namespace XamarinUncrustify
 		{
 			get { return _property; }
 		}
+
+		static CommandExecuter _commandOnSaveDocumentExecuter = new CommandExecuter();
 	}
 }

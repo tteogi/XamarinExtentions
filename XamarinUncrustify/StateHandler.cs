@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Mono.Addins;
 using MonoDevelop.Components.Commands;
 using MonoDevelop.Ide;
@@ -14,8 +15,7 @@ namespace XamarinUncrustify
 		protected override void Run()
 		{
 			IdeApp.Workspace.WorkspaceItemOpened += OnSoultionOpened;
-			IdeApp.Workspace.ItemRemovedFromSolution += Workspace_ItemRemovedFromSolution;
-	
+			IdeApp.Workspace.ItemRemovedFromSolution += OnProjectRemoved;
 		}
 
 		private void OnRemove(object sender, SolutionItemChangeEventArgs e)
@@ -28,9 +28,29 @@ namespace XamarinUncrustify
 		private void OnSaved(object sender, EventArgs e)
 		{
 			var name = IdeApp.Workbench.ActiveDocument.Project.Name;
-			if (Environment.OSVersion.Platform == PlatformID.Unix)
+			var project = App.Property.Projects.Find((obj) => obj.Name == name);
+
+			var placeholder = new Placeholder(new Dictionary<string, string>
 			{
+				{
+					@"\${file}",
+					Path.GetFullPath(IdeApp.Workbench.ActiveDocument.FileName)
+				},
+				{
+					@"\${workspace}",
+					Path.GetFullPath(IdeApp.ProjectOperations.CurrentSelectedProject.BaseDirectory)
+				},
+			});
+
+			foreach (var cmd in project.Commands)
+			{
+				CommandExecuter.Execute(cmd, IdeApp.ProjectOperations.CurrentSelectedProject.BaseDirectory, placeholder);
 			}
+			IdeApp.Workbench.ActiveDocument.Reload();
+
+			//if (Environment.OSVersion.Platform == PlatformID.Unix)
+			//{
+			//}
 		}
 
 		private void OnDocumentOpened(object sender, DocumentEventArgs e)
@@ -45,27 +65,19 @@ namespace XamarinUncrustify
 
 		private void OnSoultionOpened(object sender, WorkspaceItemEventArgs e)
 		{
-					IdeApp.Workbench.DocumentOpened += OnDocumentOpened;
-					IdeApp.Workbench.DocumentClosed += OnDocumentClosed;
-					IdeApp.Workspace.ItemRemovedFromSolution += OnRemove;
+			IdeApp.Workbench.DocumentOpened += OnDocumentOpened;
+			IdeApp.Workbench.DocumentClosed += OnDocumentClosed;
+			IdeApp.Workspace.ItemRemovedFromSolution += OnRemove;
 
-					foreach (var item in IdeApp.Workspace.GetAllItems<Project>())
-					{
-						item.ProjectProperties.SetValue("CommandFilePathKey", "../../test.config");
-						//var monitor = new MonoDevelop.Core.ProgressMonitor();
-						//var task = item.SaveAsync(monitor);
-						//while (true)
-						//{
-						//	if (task.IsCompleted || task.IsCanceled || task.IsFaulted)
-						//		break;
-						//	task.Wait(100);
-						//}
-						App.Property.Projects.Add(new CommandProperty.Project(item.Name, item.BaseDirectory,
-																		   new GMonoDevelop.UniversalPropertySet(item.ProjectProperties)));
-					}
+			foreach (var item in IdeApp.Workspace.GetAllItems<Project>())
+			{
+				item.ProjectProperties.SetValue("CommandFilePathKey", "../../test.txt");
+				App.Property.Projects.Add(new CommandProperty.Project(item.Name, item.BaseDirectory,
+																   new GMonoDevelop.UniversalPropertySet(item.ProjectProperties)));
+			}
 		}
 
-		void Workspace_ItemRemovedFromSolution (object sender, SolutionItemChangeEventArgs e)
+		void OnProjectRemoved(object sender, SolutionItemChangeEventArgs e)
 		{
 			var project = e.SolutionItem as Project;
 			if (project != null)

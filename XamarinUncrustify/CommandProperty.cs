@@ -30,8 +30,15 @@ namespace XamarinUncrustify
 				get
 				{
 					if (_propertySet.HasValue(IsCommandOnSaveKey) == false)
-						return true;
+						return false;
 					return _propertySet.GetValue<bool>(IsCommandOnSaveKey);
+				}
+				set
+				{
+					if (value == true)
+						_propertySet.SetValue(IsCommandOnSaveKey, value);
+					else
+						_propertySet.RemoveValue(IsCommandOnSaveKey);
 				}
 			}
 			public string CommandFilePath
@@ -41,6 +48,13 @@ namespace XamarinUncrustify
 					if (_propertySet.HasValue(CommandFilePathKey) == false)
 						return null;
 					return _propertySet.GetValue<string>(CommandFilePathKey);
+				}
+				set
+				{
+					if (string.IsNullOrEmpty(value) == false)
+						_propertySet.SetValue(CommandFilePathKey, value);
+					else
+						_propertySet.RemoveValue(CommandFilePathKey);
 				}
 			}
 
@@ -86,7 +100,7 @@ namespace XamarinUncrustify
 						}
 						_commandFilewatcher = new FileSystemWatcher();
 						_commandFilewatcher.Path = Path.GetDirectoryName(commandFilePath);
-						_commandFilewatcher.Filter = "*"+Path.GetExtension(commandFilePath);
+						_commandFilewatcher.Filter = "*" + Path.GetExtension(commandFilePath);
 						_commandFilewatcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
 		   					| NotifyFilters.FileName | NotifyFilters.DirectoryName;
 

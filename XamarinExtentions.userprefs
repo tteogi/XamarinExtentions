@@ -1,32 +1,35 @@
 ﻿<Properties StartupConfiguration="{BF91AED1-A4CE-4026-8158-12EF37D565E2}|">
-  <MonoDevelop.Ide.ItemProperties.XamarinUncrustify PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="XamarinUncrustify/CommandProperty.cs">
-    <Files>
-      <File FileName="XamarinUncrustify/ProcessExecuteOnSave.cs" Line="18" Column="34" />
-      <File FileName="XamarinUncrustify/StateHandler.cs" Line="68" Column="39" />
-      <File FileName="XamarinUncrustify/CommandProperty.cs" Line="102" Column="1" />
-      <File FileName="XamarinUncrustify/FormattingCommander.cs" Line="39" Column="40" />
-      <File FileName="XamarinUncrustify/packages.config" Line="5" Column="12" />
-      <File FileName="XamarinUncrustify/ConfigurePanel.cs" Line="25" Column="4" />
-      <File FileName="XamarinUncrustify/App.cs" Line="4" Column="18" />
-    </Files>
-    <Pads>
-      <Pad Id="ProjectPad">
-        <State name="__root__">
-          <Node name="XamarinExtentions" expanded="True">
-            <Node name="XamarinUncrustify" expanded="True" />
-          </Node>
-        </State>
-      </Pad>
-    </Pads>
-  </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
       <Breakpoint file="D:\subwork\XamarinExtentions\XamarinUncrustify\Main.cs" line="10" column="30" />
       <Breakpoint file="D:\subwork\XamarinExtentions\XamarinUncrustify\MainClass.cs" line="17" column="1" />
       <Breakpoint file="D:\subwork\XamarinExtentions\XamarinUncrustify\MainClass.cs" line="11" column="1" />
+      <Breakpoint file="D:\subwork\Extentions\XamarinExtentions\XamarinUncrustify\ConfigurePanel.cs" line="20" column="48" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workbench ActiveDocument="XamarinExtentions Status">
+    <Files>
+      <File FileName="XamarinUncrustify\ProcessExecuteOnSave.cs" Line="18" Column="34" />
+      <File FileName="XamarinUncrustify\FormattingCommander.cs" Line="1" Column="1" />
+      <File FileName="XamarinUncrustify\ConfigurePanel.cs" Line="21" Column="4" />
+      <File FileName="XamarinUncrustify\Properties\Manifest.addin.xml" Line="17" Column="1" />
+      <File FileName="XamarinUncrustify\CommandProperty.cs" Line="48" Column="61" />
+      <File FileName="XamarinExtentions Status" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="XamarinExtentions" expanded="True" selected="True">
+            <Node name="XamarinUncrustify" expanded="True">
+              <Node name="References" expanded="True" />
+              <Node name="Properties" expanded="True" />
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.ItemProperties.XamarinUncrustify PreferredExecutionTarget="MonoDevelop.Default" />
 </Properties>

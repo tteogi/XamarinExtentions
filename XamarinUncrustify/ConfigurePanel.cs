@@ -15,6 +15,9 @@ namespace XamarinUncrustify
 		public override void ApplyChanges()
 		{
 			//CommandProperty.SetFormatOnSave((Solution)DataObject, _formatOnSave.Active);
+			var project = App.Property.GetProject(IdeApp.ProjectOperations.CurrentSelectedProject.Name);
+			project.IsCommandOnSave = _cmdOnSave.Active;
+			project.CommandFilePath = _cmdFilePath.Text;
 		}
 
 		public override Control CreatePanelWidget()
@@ -27,7 +30,7 @@ namespace XamarinUncrustify
 			var pro = IdeApp.ProjectOperations.CurrentSelectedProject;
 
 			var project = App.Property.GetProject(IdeApp.ProjectOperations.CurrentSelectedProject.Name);
-			_cmdOnSave = new Xwt.CheckBox(GettextCatalog.GetString("command on save"))
+			_cmdOnSave = new Xwt.CheckBox(GettextCatalog.GetString("run on save"))
 			{
 				Active = project == null || project.IsCommandOnSave
 			};
@@ -38,6 +41,7 @@ namespace XamarinUncrustify
 			};
 
 			box.PackStart(_cmdOnSave);
+			box.PackStart(_cmdFilePath);
 			box.Show();
 			return box.ToGtkWidget();
 		}

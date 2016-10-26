@@ -35,6 +35,8 @@
     <Compile Include="ConfigurePanel.cs" />
     <Compile Include="CommandProperty.cs" />
     <Compile Include="App.cs" />
+    <Compile Include="CommandExecuter.cs" />
+    <Compile Include="Placeholder.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Manifest.addin.xml">

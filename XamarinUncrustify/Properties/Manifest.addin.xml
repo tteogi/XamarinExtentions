@@ -9,19 +9,16 @@
 	<Extension path="/MonoDevelop/Ide/StartupHandlers">
 		<Class class="XamarinUncrustify.StateHandler" />
 	</Extension>
-
-	<Extension path = "/MonoDevelop/ProjectModel/Gui/ItemOptionPanels">
-		<Section id="XamarinUncrustify" _label="Xamarin Uncrustify" >
+	<Extension path="/MonoDevelop/ProjectModel/Gui/ItemOptionPanels">
+		<Section id="XamarinUncrustify" _label="Xamarin Uncrustify">
 			<ComplexCondition>
 				<Or>
 					<Condition id="ItemType" value="SolutionFolderItem" />
-					<Condition id="ItemType" value="Solution" />
 				</Or>
 				<Section id="XamarinUncrustifyConfig" _label="Uncrustify Configure" fill="true" class="XamarinUncrustify.ConfigurePanel" />
 			</ComplexCondition>
 		</Section>
 	</Extension>
-	
 	<Runtime>
 		<Import assembly="XamarinUncrustify.dll" />
 	</Runtime>
