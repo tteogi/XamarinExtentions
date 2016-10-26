@@ -20,8 +20,6 @@ namespace XamarinUncrustify
 
 		public static void Execute(CommandProperty.Command command, string workspaceDirectory, Placeholder placeholder = null)
 		{
-			//cmd.Cmd = "../../Middleware/uncrustify/uncrustify";
-			//cmd.Argument = "-c ${workspace}/../../Middleware/uncrustify/cfg/uncrustify.cfg --replace --no-backup ${file}";
 			string cmd = command.Cmd;
 			string arg = command.Argument;
 			if (placeholder != null)
@@ -37,7 +35,12 @@ namespace XamarinUncrustify
 				absoluteCmdPatch = Path.GetFullPath(absoluteCmdPatch);
 			}
 
-			var process = Process.Start(absoluteCmdPatch, arg);
+			var process = Process.Start(new ProcessStartInfo(absoluteCmdPatch, arg)
+			{
+				WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory,
+				CreateNoWindow = true,
+				UseShellExecute = false,
+			});
 			process.WaitForExit();
 		}
 	}
