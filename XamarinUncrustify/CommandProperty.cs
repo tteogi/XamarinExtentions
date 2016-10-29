@@ -123,8 +123,9 @@ namespace XamarinUncrustify
 				Console.WriteLine("File: " + e.FullPath + " " + e.ChangeType);
 				if (File.Exists(e.FullPath))
 				{
-					var text = File.ReadAllText(e.FullPath);
-					_commands = JsonConvert.DeserializeObject<List<Command>>(text);
+					var stream = File.Open(e.FullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+					StreamReader reader = new StreamReader(stream);
+					_commands = JsonConvert.DeserializeObject<List<Command>>(reader.ReadToEnd());
 				}
 			}
 		}
