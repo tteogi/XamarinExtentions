@@ -17,6 +17,7 @@ namespace XamarinUncrustify
 			public string Cmd;
 			public string Argument;
 			public string FileMatch;
+			public bool TextChange;
 		}
 
 		public class Project

@@ -13,12 +13,12 @@ namespace XamarinUncrustify
 			_workspace = workspace;
 		}
 
-		public void Execute(CommandProperty.Command command, Placeholder placeholder = null)
+		public string Execute(CommandProperty.Command command, Placeholder placeholder = null)
 		{
-			Execute(command, _workspace, placeholder);
+			return Execute(command, _workspace, placeholder);
 		}
 
-		public static void Execute(CommandProperty.Command command, string workspaceDirectory, Placeholder placeholder = null)
+		public static string Execute(CommandProperty.Command command, string workspaceDirectory, Placeholder placeholder = null)
 		{
 			string cmd = command.Cmd;
 			string arg = command.Argument;
@@ -29,19 +29,34 @@ namespace XamarinUncrustify
 			}
 
 			string absoluteCmdPatch = cmd;//Path.GetFullPath(cmd.Cmd);
-			if (GCore.Path.IsAbsolutePatch(absoluteCmdPatch))
+			if (GCore.Path.IsAbsolutePatch(absoluteCmdPatch) == false)
 			{
 				absoluteCmdPatch = Path.Combine(workspaceDirectory, absoluteCmdPatch);
 				absoluteCmdPatch = Path.GetFullPath(absoluteCmdPatch);
 			}
 
-			var process = Process.Start(new ProcessStartInfo(absoluteCmdPatch, arg)
+			var process = new Process();
+			process.StartInfo = (new ProcessStartInfo(absoluteCmdPatch, arg)
 			{
 				WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory,
 				CreateNoWindow = true,
 				UseShellExecute = false,
+				//RedirectStandardOutput = true,
 			});
+
+			var outStr = "";
+			//process.OutputDataReceived += (sender, e) =>
+			//{
+			//	outStr += e.Data + "\n";
+			//};
+
+			process.Start();
+			//process.BeginOutputReadLine();
+
 			process.WaitForExit();
+
+			process.Close();
+			return outStr;
 		}
 	}
 }

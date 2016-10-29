@@ -81,9 +81,7 @@ namespace XamarinUncrustify
 
 			foreach (var item in IdeApp.Workspace.GetAllItems<Project>())
 			{
-				item.ProjectProperties.SetValue("CommandFilePathKey", "../../Env/RunOnSave.config");
-				App.Property.Projects.Add(new CommandProperty.Project(item.Name, item.BaseDirectory,
-																   new GMonoDevelop.UniversalPropertySet(item.ProjectProperties)));
+				AddProject(item);
 			}
 		}
 
@@ -101,10 +99,16 @@ namespace XamarinUncrustify
 			var project = e.SolutionItem as Project;
 			if (project != null)
 			{
-				project.ProjectProperties.SetValue("CommandFilePathKey", "../../Env/RunOnSave.config");
-				App.Property.Projects.Add(new CommandProperty.Project(
-					project.Name, project.BaseDirectory, new GMonoDevelop.UniversalPropertySet(project.ProjectProperties)));
+				AddProject(project);
 			}
+		}
+
+		static void AddProject(Project project)
+		{
+			if (project.ProjectProperties.HasProperty("CommandFilePathKey") == false)
+				project.ProjectProperties.SetValue("CommandFilePathKey", "../../Env/RunOnSave.config");
+			App.Property.Projects.Add(new CommandProperty.Project(
+				project.Name, project.BaseDirectory, new GMonoDevelop.UniversalPropertySet(project.ProjectProperties)));
 		}
 	}
 }
