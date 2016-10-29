@@ -10,6 +10,7 @@
     <RootNamespace>XamarinUncrustify</RootNamespace>
     <AssemblyName>XamarinUncrustify</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <CommandFilePathKey>../../test.txt</CommandFilePathKey>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

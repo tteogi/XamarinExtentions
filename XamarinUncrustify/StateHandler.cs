@@ -16,6 +16,7 @@ namespace XamarinUncrustify
 		{
 			IdeApp.Workspace.WorkspaceItemOpened += OnSoultionOpened;
 			IdeApp.Workspace.ItemRemovedFromSolution += OnProjectRemoved;
+			IdeApp.Workspace.ItemAddedToSolution += OnProjectAdded;
 		}
 
 		private void OnRemove(object sender, SolutionItemChangeEventArgs e)
@@ -29,28 +30,37 @@ namespace XamarinUncrustify
 		{
 			var name = IdeApp.Workbench.ActiveDocument.Project.Name;
 			var project = App.Property.Projects.Find((obj) => obj.Name == name);
-
-			var placeholder = new Placeholder(new Dictionary<string, string>
+			if (project.IsCommandOnSave)
 			{
+				var placeholder = new Placeholder(new Dictionary<string, string>
 				{
-					@"\${file}",
-					Path.GetFullPath(IdeApp.Workbench.ActiveDocument.FileName)
-				},
-				{
-					@"\${workspace}",
-					Path.GetFullPath(IdeApp.ProjectOperations.CurrentSelectedProject.BaseDirectory)
-				},
-			});
+					{
+						@"\${file}",
+						Path.GetFullPath(IdeApp.Workbench.ActiveDocument.FileName)
+					},
+					{
+						@"\${workspace}",
+						Path.GetFullPath(IdeApp.ProjectOperations.CurrentSelectedProject.BaseDirectory)
+					},
+				});
 
-			foreach (var cmd in project.Commands)
-			{
-				CommandExecuter.Execute(cmd, IdeApp.ProjectOperations.CurrentSelectedProject.BaseDirectory, placeholder);
+				foreach (var cmd in project.Commands)
+				{
+					CommandExecuter.Execute(cmd, IdeApp.ProjectOperations.CurrentSelectedProject.BaseDirectory, placeholder);
+				}
+
+
+				var editor = IdeApp.Workbench.ActiveDocument.Editor;
+				var offset = editor.CaretOffset;
+				var line = editor.CaretLine;
+				var col = editor.CaretColumn;
+
+				IdeApp.Workbench.ActiveDocument.Reload();
+
+				editor.CaretLine = line;
+				editor.CaretColumn = col;
+				editor.CenterTo(offset);
 			}
-			IdeApp.Workbench.ActiveDocument.Reload();
-
-			//if (Environment.OSVersion.Platform == PlatformID.Unix)
-			//{
-			//}
 		}
 
 		private void OnDocumentOpened(object sender, DocumentEventArgs e)
@@ -71,7 +81,7 @@ namespace XamarinUncrustify
 
 			foreach (var item in IdeApp.Workspace.GetAllItems<Project>())
 			{
-				item.ProjectProperties.SetValue("CommandFilePathKey", "../../test.txt");
+				item.ProjectProperties.SetValue("CommandFilePathKey", "../../Env/RunOnSave.config");
 				App.Property.Projects.Add(new CommandProperty.Project(item.Name, item.BaseDirectory,
 																   new GMonoDevelop.UniversalPropertySet(item.ProjectProperties)));
 			}
@@ -83,6 +93,17 @@ namespace XamarinUncrustify
 			if (project != null)
 			{
 				App.Property.Projects.RemoveAll((obj) => obj.Name == project.Name);
+			}
+		}
+
+		private void OnProjectAdded(object sender, SolutionItemChangeEventArgs e)
+		{
+			var project = e.SolutionItem as Project;
+			if (project != null)
+			{
+				project.ProjectProperties.SetValue("CommandFilePathKey", "../../Env/RunOnSave.config");
+				App.Property.Projects.Add(new CommandProperty.Project(
+					project.Name, project.BaseDirectory, new GMonoDevelop.UniversalPropertySet(project.ProjectProperties)));
 			}
 		}
 	}

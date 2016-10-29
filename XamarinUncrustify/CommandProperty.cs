@@ -23,6 +23,7 @@ namespace XamarinUncrustify
 		{
 			private UniversalPropertySet _propertySet;
 			private FileSystemWatcher _commandFilewatcher;
+			private string _workspace;
 			private string _name;
 
 			public bool IsCommandOnSave
@@ -79,11 +80,16 @@ namespace XamarinUncrustify
 					_commandFilewatcher.Dispose();
 				}
 			}
+			public void Reset()
+			{
+				Reset(_name, _workspace, _propertySet);
+			}
 
 			public void Reset(string name, string workspace, UniversalPropertySet set)
 			{
 				_name = name;
 				_propertySet = set;
+				_workspace = workspace;
 
 				if (string.IsNullOrEmpty(CommandFilePath) == false)
 				{

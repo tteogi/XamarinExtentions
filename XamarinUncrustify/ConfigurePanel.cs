@@ -18,6 +18,7 @@ namespace XamarinUncrustify
 			var project = App.Property.GetProject(IdeApp.ProjectOperations.CurrentSelectedProject.Name);
 			project.IsCommandOnSave = _cmdOnSave.Active;
 			project.CommandFilePath = _cmdFilePath.Text;
+			project.Reset();
 		}
 
 		public override Control CreatePanelWidget()
