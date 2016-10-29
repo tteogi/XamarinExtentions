@@ -38,7 +38,7 @@ namespace XamarinUncrustify
 			var process = new Process();
 			process.StartInfo = (new ProcessStartInfo(absoluteCmdPatch, arg)
 			{
-				WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory,
+				WorkingDirectory = workspaceDirectory,
 				CreateNoWindow = true,
 				UseShellExecute = false,
 				//RedirectStandardOutput = true,
