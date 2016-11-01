@@ -12,83 +12,96 @@ namespace UnityMarin
 	{
 		protected override void Run()
 		{
-			base.Run();
-
-			IdeApp.Exiting += (object sender, ExitEventArgs args) =>
+			try
 			{
-				Service.Shutdown();
-			};
+				base.Run();
 
-			string file = null;
-			string line = null;
-			string solution = null;
-			var cargs = Environment.GetCommandLineArgs();
-			int i = 1;
-			while (i < cargs.Length - 1)
-			{
-				var a = cargs[i];
-				if (a == "--tortuga-team-file")
+				IdeApp.Exiting += (object sender, ExitEventArgs args) =>
 				{
-					file = cargs[i + 1];
-					i++;
-				}
-				else if (a == "--tortuga-team-line")
-				{
-					line = cargs[i + 1];
-					i++;
-				}
-				else if (a == "--tortuga-team-solution")
-				{
-					solution = cargs[i + 1];
-					i++;
-				}
-				i++;
-			}
+					Service.Shutdown();
+				};
 
-			if (!string.IsNullOrWhiteSpace(file) || !string.IsNullOrWhiteSpace(solution))
-			{
-				IdeApp.Initialized += (object sender, EventArgs e) =>
+				string file = null;
+				string line = null;
+				string solution = null;
+				var cargs = Environment.GetCommandLineArgs();
+				int i = 1;
+				while (i < cargs.Length - 1)
 				{
-					var files = new List<FileOpenInformation>();
-
-					if (!string.IsNullOrWhiteSpace(solution))
+					var a = cargs[i];
+					if (a == "--tortuga-team-file")
 					{
-						files.Add(new FileOpenInformation(
-							new FilePath(solution),
-							null,
-							0,
-							0,
-							OpenDocumentOptions.TryToReuseViewer | OpenDocumentOptions.BringToFront | OpenDocumentOptions.CenterCaretLine
-						));
+						file = cargs[i + 1];
+						i++;
 					}
-
-					if (!string.IsNullOrWhiteSpace(file))
+					else if (a == "--tortuga-team-line")
 					{
-						int lineNum;
-						if (line == null || !int.TryParse(line, out lineNum))
+						line = cargs[i + 1];
+						i++;
+					}
+					else if (a == "--tortuga-team-solution")
+					{
+						solution = cargs[i + 1];
+						i++;
+					}
+					i++;
+				}
+
+				if (!string.IsNullOrWhiteSpace(file) || !string.IsNullOrWhiteSpace(solution))
+				{
+					IdeApp.Initialized += (object sender, EventArgs e) =>
+					{
+						var files = new List<FileOpenInformation>();
+
+						if (!string.IsNullOrWhiteSpace(solution))
 						{
-							lineNum = 0;
+							files.Add(new FileOpenInformation(
+								new FilePath(solution),
+								null,
+								0,
+								0,
+								OpenDocumentOptions.TryToReuseViewer | OpenDocumentOptions.BringToFront | OpenDocumentOptions.CenterCaretLine
+							));
 						}
 
-						files.Add(new FileOpenInformation(
-							new FilePath(file),
-							null,
-							lineNum,
-							0,
-							OpenDocumentOptions.TryToReuseViewer | OpenDocumentOptions.BringToFront | OpenDocumentOptions.CenterCaretLine
-						));
-					}
+						if (!string.IsNullOrWhiteSpace(file))
+						{
+							int lineNum;
+							if (line == null || !int.TryParse(line, out lineNum))
+							{
+								lineNum = 0;
+							}
 
-					IdeApp.OpenFiles(files.ToArray());
-				};
+							files.Add(new FileOpenInformation(
+								new FilePath(file),
+								null,
+								lineNum,
+								0,
+								OpenDocumentOptions.TryToReuseViewer | OpenDocumentOptions.BringToFront | OpenDocumentOptions.CenterCaretLine
+							));
+						}
+
+						IdeApp.OpenFiles(files.ToArray());
+					};
+				}
+				IdeApp.Workspace.WorkspaceItemOpened += OnSoultionOpened;
 			}
-			IdeApp.Workspace.WorkspaceItemOpened += OnSoultionOpened;
-
+			catch(Exception ex)
+			{
+				LoggingService.LogError("Unity Tools: StartupHandler Run", ex);
+			}
 		}
 
 		private void OnSoultionOpened(object sender, WorkspaceItemEventArgs e)
 		{
-			Service.Initialize(e.Item.BaseDirectory);
+			try
+			{
+				Service.Initialize(e.Item.BaseDirectory);
+			}
+			catch (Exception ex)
+			{
+				LoggingService.LogError("Unity Tools: StartupHandler OnSoultionOpened", ex);
+			}
 		}
 	}
 }

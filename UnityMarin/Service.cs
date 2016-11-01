@@ -139,21 +139,22 @@ namespace UnityMarin
 
 			if (client != null)
 			{
-				//try
-				//{
-				var state = new ConnectionState
+				try
 				{
-					Client = client,
-					Buffer = new byte[1024],
-					Received = 0,
-					Expecting = 4
-				};
-				client.Client.BeginReceive(state.Buffer, state.Received, state.Expecting, SocketFlags.None, this.OnReceiveMessageLength, state);
-				//}
-				//catch (Exception ex)
-				//{
-				//	client.Close();
-				//}
+					var state = new ConnectionState
+					{
+						Client = client,
+						Buffer = new byte[1024],
+						Received = 0,
+						Expecting = 4
+					};
+					client.Client.BeginReceive(state.Buffer, state.Received, state.Expecting, SocketFlags.None, this.OnReceiveMessageLength, state);
+				}
+				catch (Exception ex)
+				{
+					client.Close();
+					LoggingService.LogError("Unity Tools: listener continue accept client failed", ex);
+				}
 			}
 
 			try
@@ -170,90 +171,104 @@ namespace UnityMarin
 
 		private void OnReceiveMessageLength(IAsyncResult ar)
 		{
-			var state = (ConnectionState)ar.AsyncState;
-			int received = 0;
 			try
 			{
-				received = state.Client.Client.EndReceive(ar);
+				var state = (ConnectionState)ar.AsyncState;
+				int received = 0;
+				try
+				{
+					received = state.Client.Client.EndReceive(ar);
+				}
+				catch
+				{
+				}
+
+				if (received == 0)
+				{
+					state.Client.Close();
+					return;
+				}
+
+				state.Received += received;
+
+				if (state.Received < state.Expecting)
+				{
+					state.Client.Client.BeginReceive(state.Buffer, state.Received, state.Expecting - state.Received, SocketFlags.None, this.OnReceiveMessageLength, state);
+					return;
+				}
+
+				int length = BitConverter.ToInt32(state.Buffer, 0);
+
+				if (length <= 0 || length > state.Buffer.Length)
+				{
+					state.Client.Close();
+					return;
+				}
+
+				state.Received = 0;
+				state.Expecting = length;
+				state.Client.Client.BeginReceive(state.Buffer, state.Received, state.Expecting, SocketFlags.None, this.OnReceiveMessageBody, state);
 			}
-			catch
+			catch(Exception ex)
 			{
+				LoggingService.LogError("Unity Tools: OnReceiveMessageLength", ex);
 			}
-
-			if (received == 0)
-			{
-				state.Client.Close();
-				return;
-			}
-
-			state.Received += received;
-
-			if (state.Received < state.Expecting)
-			{
-				state.Client.Client.BeginReceive(state.Buffer, state.Received, state.Expecting - state.Received, SocketFlags.None, this.OnReceiveMessageLength, state);
-				return;
-			}
-
-			int length = BitConverter.ToInt32(state.Buffer, 0);
-
-			if (length <= 0 || length > state.Buffer.Length)
-			{
-				state.Client.Close();
-				return;
-			}
-
-			state.Received = 0;
-			state.Expecting = length;
-			state.Client.Client.BeginReceive(state.Buffer, state.Received, state.Expecting, SocketFlags.None, this.OnReceiveMessageBody, state);
 		}
 
 		private void OnReceiveMessageBody(IAsyncResult ar)
 		{
-			var state = (ConnectionState)ar.AsyncState;
-			int received = 0;
 			try
 			{
-				received = state.Client.Client.EndReceive(ar);
+				var state = (ConnectionState)ar.AsyncState;
+				int received = 0;
+				try
+				{
+					received = state.Client.Client.EndReceive(ar);
+				}
+				catch
+				{
+				}
+
+				if (received == 0)
+				{
+					state.Client.Close();
+					return;
+				}
+
+				state.Received += received;
+
+				if (state.Received < state.Expecting)
+				{
+					state.Client.Client.BeginReceive(state.Buffer, state.Received, state.Expecting - state.Received, SocketFlags.None, this.OnReceiveMessageLength, state);
+					return;
+				}
+
+				string msg = null;
+				try
+				{
+					msg = encoding.GetString(state.Buffer, 0, state.Expecting);
+				}
+				catch
+				{
+					LoggingService.LogInfo("Unity Tools: message error");
+				}
+
+				this.SendResponse(state, msg != null);
+
+
+				//DispatchService.GuiDispatch(() =>
+				//{
+				//	this.ProcessMessage(msg);
+				//});
+				DispatchService.SynchronizationContext.Post((syncState) =>
+			   {
+				   this.ProcessMessage(msg);
+			   }, this);
 			}
-			catch
+			catch (Exception ex)
 			{
+				LoggingService.LogError("Unity Tools: OnReceiveMessageBody", ex);
 			}
-
-			if (received == 0)
-			{
-				state.Client.Close();
-				return;
-			}
-
-			state.Received += received;
-
-			if (state.Received < state.Expecting)
-			{
-				state.Client.Client.BeginReceive(state.Buffer, state.Received, state.Expecting - state.Received, SocketFlags.None, this.OnReceiveMessageLength, state);
-				return;
-			}
-
-			string msg = null;
-			try
-			{
-				msg = encoding.GetString(state.Buffer, 0, state.Expecting);
-			}
-			catch
-			{
-				LoggingService.LogInfo("Unity Tools: message error");
-			}
-
-			this.SendResponse(state, msg != null);
-
-
-			//DispatchService.GuiDispatch(() =>
-			//{
-			//	this.ProcessMessage(msg);
-			//});
-			DispatchService.SynchronizationContext.Post( (syncState) => 
-			{
-				this.ProcessMessage(msg);
-			}, this);
 		}
 
 		private void SendResponse(ConnectionState state, bool success)
@@ -266,30 +281,37 @@ namespace UnityMarin
 
 		private void OnSendResponse(IAsyncResult ar)
 		{
-			var state = (ConnectionState)ar.AsyncState;
-			int sent = 0;
 			try
 			{
-				sent = state.Client.Client.EndSend(ar);
-			}
-			catch
-			{
-			}
+				var state = (ConnectionState)ar.AsyncState;
+				int sent = 0;
+				try
+				{
+					sent = state.Client.Client.EndSend(ar);
+				}
+				catch
+				{
+				}
 
-			if (sent == 0)
-			{
-				LoggingService.LogInfo("Unity Tools: send response error");
+				if (sent == 0)
+				{
+					LoggingService.LogInfo("Unity Tools: send response error");
+					state.Client.Close();
+					return;
+				}
+				state.Received += sent;
+				if (state.Received < state.Expecting)
+				{
+					state.Client.Client.BeginSend(state.Buffer, state.Received, state.Expecting, SocketFlags.None, this.OnSendResponse, state);
+					return;
+				}
+
 				state.Client.Close();
-				return;
 			}
-			state.Received += sent;
-			if (state.Received < state.Expecting)
+			catch (Exception ex)
 			{
-				state.Client.Client.BeginSend(state.Buffer, state.Received, state.Expecting, SocketFlags.None, this.OnSendResponse, state);
-				return;
+				LoggingService.LogError("Unity Tools: send response error", ex);
 			}
-
-			state.Client.Close();
 		}
 
 		private void ProcessMessage(string message)

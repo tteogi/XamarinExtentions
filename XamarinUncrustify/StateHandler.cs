@@ -14,16 +14,22 @@ namespace XamarinUncrustify
 	{
 		protected override void Run()
 		{
-			IdeApp.Workspace.WorkspaceItemOpened += OnSoultionOpened;
-			IdeApp.Workspace.ItemRemovedFromSolution += OnProjectRemoved;
-			IdeApp.Workspace.ItemAddedToSolution += OnProjectAdded;
+			try
+			{
+				IdeApp.Workspace.WorkspaceItemOpened += OnSoultionOpened;
+				IdeApp.Workspace.ItemRemovedFromSolution += OnProjectRemoved;
+				IdeApp.Workspace.ItemAddedToSolution += OnProjectAdded;
+			}
+			catch
+			{
+			}
 		}
 
 		private void OnRemove(object sender, SolutionItemChangeEventArgs e)
 		{
-			var name = e.SolutionItem.Name;
-			App.Property.Projects.RemoveAll((obj) => obj.Name == name);
-			name = e.SolutionItem.Name;
+				var name = e.SolutionItem.Name;
+				App.Property.Projects.RemoveAll((obj) => obj.Name == name);
+				name = e.SolutionItem.Name;
 		}
 
 		private void OnSaved(object sender, EventArgs e)
