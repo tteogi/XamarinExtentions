@@ -5,7 +5,7 @@ using Mono.Addins.Description;
 [assembly: Addin(
 	"UnityMarin",
 	Namespace = "UnityMarin",
-	Version = "1.0.1"
+	Version = "1.0.7"
 )]
 
 [assembly: AddinName("UnityMarin")]

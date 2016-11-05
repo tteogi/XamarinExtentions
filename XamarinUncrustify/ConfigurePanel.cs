@@ -14,11 +14,12 @@ namespace XamarinUncrustify
 
 		public override void ApplyChanges()
 		{
-			//CommandProperty.SetFormatOnSave((Solution)DataObject, _formatOnSave.Active);
-			var project = App.Property.GetProject(IdeApp.ProjectOperations.CurrentSelectedProject.Name);
-			project.IsCommandOnSave = _cmdOnSave.Active;
-			project.CommandFilePath = _cmdFilePath.Text;
-			project.Reset();
+			var project = App.Properties[IdeApp.ProjectOperations.CurrentSelectedSolution.Name]
+			                 .GetProject(IdeApp.ProjectOperations.CurrentSelectedProject.Name);
+			project.IsRunOnSave = _cmdOnSave.Active;
+			project.CommandConfigPath = _cmdFilePath.Text;
+			project.SaveConfig();
+			App.Properties[IdeApp.ProjectOperations.CurrentSelectedSolution.Name].SaveProperties(IdeApp.ProjectOperations.CurrentSelectedSolution.BaseDirectory);
 		}
 
 		public override Control CreatePanelWidget()
@@ -30,15 +31,15 @@ namespace XamarinUncrustify
 			var sol = IdeApp.ProjectOperations.CurrentSelectedSolution;
 			var pro = IdeApp.ProjectOperations.CurrentSelectedProject;
 
-			var project = App.Property.GetProject(IdeApp.ProjectOperations.CurrentSelectedProject.Name);
+			var project = App.Properties[sol.Name].GetProject(IdeApp.ProjectOperations.CurrentSelectedProject.Name);
 			_cmdOnSave = new Xwt.CheckBox(GettextCatalog.GetString("run on save"))
 			{
-				Active = project == null || project.IsCommandOnSave
+				Active = project == null || project.IsRunOnSave
 			};
 
 			_cmdFilePath = new Xwt.SearchTextEntry()
 			{
-				Text = project == null ? "" : project.CommandFilePath
+				Text = project == null ? "" : project.CommandConfigPath
 			};
 
 			box.PackStart(_cmdOnSave);

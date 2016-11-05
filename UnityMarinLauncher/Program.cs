@@ -32,14 +32,14 @@ namespace UnityMarinLauncher
 			}
 
 			int port = 12312;
-			var config = Path.Combine(Directory.GetCurrentDirectory(), "UnityMarin.config");
+			var config = Path.Combine(Directory.GetCurrentDirectory(), "XExtension.config");
 			if (File.Exists(config))
 			{
 				try
 				{
 					var obj = JObject.Parse(File.ReadAllText(config));
 					JToken token;
-					if (obj.TryGetValue("port", out token) && token.Type == JTokenType.Integer)
+					if (obj.TryGetValue("Port", out token) && token.Type == JTokenType.Integer)
 					{
 						port = (int)token;
 					}

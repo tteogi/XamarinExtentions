@@ -40,7 +40,7 @@ namespace UnityMarin
 		public Service(string baseDirectory)
 		{
 			var asm = Assembly.GetExecutingAssembly();
-			var config = Path.Combine(baseDirectory, "UnityMarin.config");
+			var config = Path.Combine(baseDirectory, "XExtension.config");
 			if (File.Exists(config))
 			{
 				try
@@ -48,7 +48,7 @@ namespace UnityMarin
 					var obj = JObject.Parse(File.ReadAllText(config));
 
 					JToken token;
-					if (obj.TryGetValue("port", out token) && token.Type == JTokenType.Integer)
+					if (obj.TryGetValue("Port", out token) && token.Type == JTokenType.Integer)
 					{
 						this.port = (int)token;
 					}
